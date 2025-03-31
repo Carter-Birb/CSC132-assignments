@@ -20,6 +20,22 @@ class Person(pygame.sprite.Sprite, Item):
         Item.__init__(self)
         self.color = []
         self.surf = pygame.Surface((self.size, self.size))
+        
+        @property
+        def color(self):
+            return self._color
+        
+        @color.setter
+        def color(self, val):
+            self._color = val
+        
+        @property
+        def surf(self):
+            return self._surf
+        
+        @surf.setter
+        def surf(self, val):
+            self._surf = val
 
 
     def setColor(self):
