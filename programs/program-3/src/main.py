@@ -5,76 +5,139 @@ from Spell import Spell
 from Spider import Spider
 from random import randint
 
-# Logic variables
-wizard_lost_life = False
-spider_hit_time = None  # Track the time the spider was hit
-spider_respawn_delay = 2000  # Delay before spider teleports back (in milliseconds)
 
-# Initialize Pygame
+#### INITIALIZATION ####
 pygame.init()
-
-# Create a screen
+pygame.font.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 
-# Create sprite groups
+# Fonts
+font = pygame.font.SysFont("Arial", 20)
+title_font = pygame.font.SysFont("Arial", 40)
+small_font = pygame.font.SysFont("Arial", 24)
+
+# Sound effects
+spider_sound = pygame.mixer.Sound(constants.SPIDER_SOUND)
+spider_sound.set_volume(0.8)
+
+
+#### START SCREEN FUNCTION ####
+def show_start_screen():
+    screen.fill(constants.GREY)
+    
+    title_text = title_font.render("Wizard Spider Blaster!", True, constants.BLACK)
+    prompt_text = small_font.render("Press any key to start", True, constants.BLACK)
+    
+    screen.blit(title_text, (constants.WIDTH // 2 - title_text.get_width() // 2, constants.HEIGHT // 2 - 100))
+    screen.blit(prompt_text, (constants.WIDTH // 2 - prompt_text.get_width() // 2, constants.HEIGHT // 2))
+    pygame.display.flip()
+    
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                waiting = False
+
+
+#### DEATH SCREEN FUNCTION ####
+def show_death_screen():
+    screen.fill(constants.GREY)
+    
+    death_text = title_font.render("YOU DIED!", True, constants.BLACK)
+    prompt_text = small_font.render("Press any key to restart", True, constants.BLACK)
+    
+    screen.blit(death_text, (constants.WIDTH // 2 - death_text.get_width() // 2, constants.HEIGHT // 2 - 100))
+    screen.blit(prompt_text, (constants.WIDTH // 2 - prompt_text.get_width() // 2, constants.HEIGHT // 2))
+    pygame.display.flip()
+    
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                waiting = False
+
+
+#### STARTING THE GAME ####
+show_start_screen()
+
+# Sprite groups
 all_sprites = pygame.sprite.Group()
-spells = pygame.sprite.Group()  # Create a group for spells
+spells = pygame.sprite.Group()
 
-# Create Wizard, Spider, and Spell instances
-wizard = Wizard()  # Add to the all_sprites group
-spider = Spider()  # Add to the all_sprites group
-
+# Create game objects
+wizard = Wizard()
+spider = Spider()
 all_sprites.add(wizard, spider)
 
-# Text Config
-pygame.font.init()
-font = pygame.font.SysFont("Arial", 20)
-
-# Main game loop
+# Game state
 running = True
+wizard_lost_life = False
+
+
+#### MAIN LOOP ####
 while running:
-    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+    # Shoot spell
     if pygame.key.get_pressed()[pygame.K_SPACE]:
         spell = wizard.shoot_spell()
-        if spell:  # Only proceed if a spell was actually created
+        if spell:
             spells.add(spell)
             all_sprites.add(spell)
-    
-    # Update all sprites (including the wizard, spider, and spell)
-    all_sprites.update()
 
-    # Check if any spell collides with the spider
+    # Update logic: prevent wizard from going offscreen
+    if (wizard.rect.left <= 0 and pygame.key.get_pressed()[pygame.K_a]) or (wizard.rect.right >= constants.WIDTH and pygame.key.get_pressed()[pygame.K_d]):
+        # Update all except wizard
+        for sprite in all_sprites:
+            if sprite != wizard:
+                sprite.update()
+    else:
+        all_sprites.update()
+
+    # Collision: spell hits spider
     for spell in spells:
         if pygame.sprite.collide_rect(spell, spider):
-            spell.kill()  # Remove the spell
-            # Move the spider off-screen (left)
-            spider.rect.x = randint(-400, -100)  # Move it off-screen to the left
+            spider_sound.play()
+            spell.kill()
+            spider.rect.x = randint(-400, -100)
+            spider.move_delay = randint(1, 10)
             wizard.score += 1
 
-    # Logic for losing lives
+    # Life loss when spider escapes
     if spider.waiting_to_reappear:
         if not wizard_lost_life:
             wizard.lose_life()
             wizard_lost_life = True
-    elif not spider.waiting_to_reappear:
+            spider.move_delay = randint(1, 10)
+    else:
         wizard_lost_life = False
     
-    # Draw all sprites
-    screen.fill(constants.GREY)  # Clear the screen with grey
-    all_sprites.draw(screen)  # Draw all sprites to the screen
-    spells.draw(screen)  # Draw all spells to the screen
-    
-    # Draw text (lives, etc.)
-    text_score = font.render(f"Score: {wizard.score}", True, (constants.BLACK))
-    screen.blit(text_score, (5, constants.HEIGHT - 45))
-    text_lives = font.render(f"Lives: {wizard.lives}", True, (constants.BLACK))
-    screen.blit(text_lives, (5, constants.HEIGHT - 25))
+    # Logic for Wizard losing all lives
+    if wizard.lives == 0:
+        wizard.lives = 3
+        wizard.score = 0
+        wizard.rect.x = constants.WIDTH // 2
+        show_death_screen()
 
-    pygame.display.flip()  # Update the display
+    # Draw everything
+    screen.fill(constants.GREY)
+    all_sprites.draw(screen)
+    spells.draw(screen)
 
-# Quit Pygame
+    # HUD
+    score_text = font.render(f"Score: {wizard.score}", True, constants.BLACK)
+    lives_text = font.render(f"Lives: {wizard.lives}", True, constants.BLACK)
+    screen.blit(score_text, (5, constants.HEIGHT - 45))
+    screen.blit(lives_text, (5, constants.HEIGHT - 25))
+
+    pygame.display.flip()
+
 pygame.quit()

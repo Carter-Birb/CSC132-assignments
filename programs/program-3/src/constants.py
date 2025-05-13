@@ -23,6 +23,15 @@ BLACK = [0x00, 0x00, 0x00]
 
 COLORS = [BLUE, RED, GREY, WHITE, BLACK]
 
+# Image paths
+WIZARD_IMAGE = '../assets/images/wizard.png'
+SPIDER_IMAGE = '../assets/images/spider.png'
+
+# Sound effect paths
+SPIDER_SOUND = '../assets/sounds/death2-340040.mp3'
+LIFE_LOST_SOUND = '../assets/sounds/retro-hurt-2-236675.mp3'
+SPELL_SOUND = '../assets/sounds/fire-magic-6947.mp3'
+
 # keys from pygame
 from pygame.locals import (
     RLEACCEL,
