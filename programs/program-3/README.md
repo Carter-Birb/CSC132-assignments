@@ -1,14 +1,27 @@
 # Wizard Shooty Game (By Carter Landry)
-## Description:
-This is a game that contains a Wizard, Spells, and a Spider. If the Spider hits the right side of the screen, the Wizard loses a life. However, if the Wizard hits the Spider with a Spell by pressing "Space", the Spider will die and the Wizard will gain a point. If all lives are lost, the game will restart.
 
-## Improvements:
-1. Made the Spider move at random speeds when it respawns.
-2. Made the Spider appear at a "random" time after hitting the right side of the screen or being hit with a Spell   
-`(The Spider teleports past the left border of the screen 100-400 pixels away, making it seem like a new Spider, but in reality, is just the same Spider teleported).`
-3. Added a start menu.
-4. Added a death menu that appears when all lives are lost, aswell as restarts the game when you "press any key to restart".
-5. Added sound effects for firing Spells, hitting the Spider with a Spell, and losing a life.
+## Description
+A simple arcade-style game featuring a Wizard, Spells, and a Spider.
 
-## Running the Game:
-run the main.py file in the src folder.
+- The Wizard can shoot spells with the `Space` key.
+- If the Spider reaches the right edge of the screen, the Wizard loses a life.
+- Hitting the Spider with a spell gives the Wizard a point.
+- The game restarts automatically when all lives are lost.
+
+## Features & Improvements
+- **Randomized Spider Speeds** – The Spider respawns with a random speed for increased challenge.
+- **Teleporting Spider Illusion** – When hit or after reaching the edge, the Spider respawns off-screen with a randomized position and delay.
+- **Start Menu** – Added a start screen before gameplay begins.
+- **Death Screen** – Displays a game-over message when all lives are lost. Press any key to restart.
+- **Sound Effects** – Includes sounds for:
+  - Firing a spell
+  - Hitting the Spider
+  - Losing a life
+
+## How to Run
+1. Make sure `pygame` is installed.
+2. Navigate to the `src/` directory.
+3. Run the game with:
+
+```bash
+python main.py
