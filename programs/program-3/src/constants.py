@@ -12,7 +12,7 @@ from random import randint, choice
 
 # constants for screen size
 WIDTH = 1200
-HEIGHT = 1000
+HEIGHT = 750
 
 # constants for colors
 RED = [0xe3, 0x1b, 0x23]
